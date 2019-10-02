@@ -93,8 +93,9 @@ header:
   color_text
   db 0ah
   color_outline
-  db '├────────┼───────────────────────────────────────────────┼────────────────┤', 0ah
+  db '├────────┼───────────────────────────────────────────────┼────────────────┤'
   term_color_clear
+  db 0ah
 header_len: equ $-header
 
 line:
@@ -114,8 +115,9 @@ begin_hex: equ $-line
 begin_ascii: equ $-line
   db '                '
   color_outline
-  db '│', 0ah
+  db '│'
   term_color_clear
+  db 0ah
 line_len: equ $-line
 
 dupline:
@@ -132,14 +134,16 @@ dupline:
   color_duplicate
   db '................'
   color_outline
-  db '│', 0ah
+  db '│'
   term_color_clear
+  db 0ah
 dupline_len: equ $-dupline
 
 footer:
   color_outline
-  db '╰────────┴───────────────────────────────────────────────┴────────────────╯', 0ah
+  db '╰────────┴───────────────────────────────────────────────┴────────────────╯'
   term_color_clear
+  db 0ah
 footer_len: equ $-footer
 
 map_hex:

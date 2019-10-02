@@ -60,83 +60,86 @@ stderr: equ 2
   db 1bh, '[38;2;', %1, ';', %2, ';', %3, 'm'
 %endmacro
 
-; primary color
-%macro color_00 0
+%macro color_text 0
   term_color_clear
 %endmacro
 
-; secondary color
-%macro color_01 0
+%macro color_outline 0
+  term_color '66', '73', '87'
+%endmacro
+
+%macro color_duplicate 0
   term_color '66', '73', '87'
 %endmacro
 
 section .rodata
 
 header:
-  color_01
+  color_outline
   db '╭────────┬───────────────────────────────────────────────┬────────────────╮', 0ah
   db '│'
-  color_00
+  color_text
   db ' offset '
-  color_01
+  color_outline
   db '│'
-  color_00
+  color_text
   db '00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f'
-  color_01
+  color_outline
   db '│'
-  color_00
+  color_text
   db '0123456789abcdef'
-  color_01
+  color_outline
   db '│',
-  color_00
+  color_text
   db 0ah
-  color_01
+  color_outline
   db '├────────┼───────────────────────────────────────────────┼────────────────┤', 0ah
-  color_00
+  term_color_clear
 header_len: equ $-header
 
 line:
-  color_01
+  color_outline
   db '│'
-  color_00
+  color_text
 begin_offset: equ $-line
   db '00000000'
-  color_01
+  color_outline
   db '│'
-  color_00
+  color_text
 begin_hex: equ $-line
   db '                                               '
-  color_01
+  color_outline
   db '│'
-  color_00
+  color_text
 begin_ascii: equ $-line
   db '                '
-  color_01
+  color_outline
   db '│', 0ah
-  color_00
+  term_color_clear
 line_len: equ $-line
 
 dupline:
-  color_01
+  color_outline
   db '│'
-  color_00
+  color_duplicate
   db '........'
-  color_01
+  color_outline
   db '│'
-  color_00
+  color_duplicate
   db '.. .. .. .. .. .. .. .. .. .. .. .. .. .. .. ..'
-  color_01
+  color_outline
   db '│'
-  color_00
+  color_duplicate
   db '................'
-  color_01
+  color_outline
   db '│', 0ah
-  color_00
+  term_color_clear
+dupline_len: equ $-dupline
 
 footer:
-  color_01
+  color_outline
   db '╰────────┴───────────────────────────────────────────────┴────────────────╯', 0ah
-  color_00
+  term_color_clear
 footer_len: equ $-footer
 
 map_hex:
@@ -364,13 +367,13 @@ output_dup:
   mov r14, 1h
 
   ; write the duplicate line to stdout
-  mov rdx, line_len
+  mov rdx, dupline_len
   mov rsi, dupline
   mov rdi, stdout
   call write
 
   ; check the return value of write
-  cmp rax, line_len
+  cmp rax, dupline_len
   jne quit_error
 
   jmp input

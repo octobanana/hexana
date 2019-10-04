@@ -50,100 +50,104 @@ stdin: equ 0
 stdout: equ 1
 stderr: equ 2
 
-; clears all term attributes
-%macro term_color_clear 0
-  db 1bh, '[0m'
-%endmacro
+; term_color '[000-255]' '[000-255]' '[000-255]'
+; make sure to pad with 0 so each value has a length of 3
+%define term_color(r, g ,b) 1bh, '[38;2;', r, ';', g, ';', b, 'm'
 
-; term_color '[0-255]' '[0-255]' '[0-255]'
-%macro term_color 3
-  db 1bh, '[38;2;', %1, ';', %2, ';', %3, 'm'
-%endmacro
+; length of the term_color string
+%define color_len 19
 
-%macro color_text 0
-  term_color_clear
-%endmacro
+; clear all term attributes
+%define term_color_clear 1bh, '[0m'
 
-%macro color_outline 0
-  term_color '66', '73', '87'
-%endmacro
+%define color_val_0 term_color('254', '087', '103')
+%define color_val_1 term_color('114', '249', '086')
+%define color_val_2 term_color('255', '157', '088')
+%define color_val_3 term_color('083', '242', '220')
 
-%macro color_duplicate 0
-  term_color '66', '73', '87'
-%endmacro
+%define color_outline term_color('066', '073', '087')
+%define color_duplicate term_color('066', '073', '087')
+%define color_offset color_val_3
+%define color_0 color_val_0
+%define color_1 color_val_1
+%define color_2 color_val_2
+%define color_3 color_val_3
+%define color_4 color_val_0
+%define color_5 color_val_1
+%define color_6 color_val_2
+%define color_7 color_val_3
+%define color_8 color_val_0
+%define color_9 color_val_1
+%define color_a color_val_2
+%define color_b color_val_3
+%define color_c color_val_0
+%define color_d color_val_1
+%define color_e color_val_2
+%define color_f color_val_3
 
 section .rodata
 
 header:
-  color_outline
-  db '╭────────┬───────────────────────────────────────────────┬────────────────╮', 0ah
-  db '│'
-  color_text
-  db ' offset '
-  color_outline
-  db '│'
-  color_text
-  db '00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f'
-  color_outline
-  db '│'
-  color_text
-  db '0123456789abcdef'
-  color_outline
-  db '│',
-  color_text
+  db color_outline, '╭────────┬───────────────────────────────────────────────┬────────────────╮', 0ah
+  db color_outline, '│'
+  db color_offset, ' offset '
+  db color_outline, '│'
+  db color_0, '00 ', color_1, '01 ', color_2, '02 ', color_3, '03 '
+  db color_4, '04 ', color_5, '05 ', color_6, '06 ', color_7, '07 '
+  db color_8, '08 ', color_9, '09 ', color_a, '0a ', color_b, '0b '
+  db color_c, '0c ', color_d, '0d ', color_e, '0e ', color_f, '0f'
+  db color_outline, '│'
+  db color_0, '0', color_1, '1', color_2, '2', color_3, '3'
+  db color_4, '4', color_5, '5', color_6, '6', color_7, '7'
+  db color_8, '8', color_9, '9', color_a, 'a', color_b, 'b'
+  db color_c, 'c', color_d, 'd', color_e, 'e', color_f, 'f'
+  db color_outline, '│',
   db 0ah
-  color_outline
-  db '├────────┼───────────────────────────────────────────────┼────────────────┤'
-  term_color_clear
-  db 0ah
+  db color_outline, '├────────┼───────────────────────────────────────────────┼────────────────┤'
+  db term_color_clear, 0ah
 header_len: equ $-header
 
 line:
-  color_outline
-  db '│'
-  color_text
+  db color_outline, '│'
+  db color_offset
 begin_offset: equ $-line
   db '00000000'
-  color_outline
-  db '│'
-  color_text
+  db color_outline, '│'
+  db color_0
 begin_hex: equ $-line
-  db '                                               '
-  color_outline
-  db '│'
-  color_text
+  db '   '
+hex_len: equ 3+color_len
+  db color_1, '   ', color_2, '   ', color_3, '   '
+  db color_4, '   ', color_5, '   ', color_6, '   ', color_7, '   '
+  db color_8, '   ', color_9, '   ', color_a, '   ', color_b, '   '
+  db color_c, '   ', color_d, '   ', color_e, '   ', color_f, '  '
+  db color_outline, '│'
+  db color_0
 begin_ascii: equ $-line
-  db '                '
-  color_outline
-  db '│'
-  term_color_clear
-  db 0ah
+  db ' '
+ascii_len: equ 1+color_len
+  db color_1, ' ', color_2, ' ', color_3, ' '
+  db color_4, ' ', color_5, ' ', color_6, ' ', color_7, ' '
+  db color_8, ' ', color_9, ' ', color_a, ' ', color_b, ' '
+  db color_c, ' ', color_d, ' ', color_e, ' ', color_f, ' '
+  db color_outline, '│'
+  db term_color_clear, 0ah
 line_len: equ $-line
 
 dupline:
-  color_outline
-  db '│'
-  color_duplicate
-  db '........'
-  color_outline
-  db '│'
-  color_duplicate
-  db '.. .. .. .. .. .. .. .. .. .. .. .. .. .. .. ..'
-  color_outline
-  db '│'
-  color_duplicate
-  db '................'
-  color_outline
-  db '│'
-  term_color_clear
-  db 0ah
+  db color_outline, '│'
+  db color_duplicate, '........'
+  db color_outline, '│'
+  db color_duplicate, '.. .. .. .. .. .. .. .. .. .. .. .. .. .. .. ..'
+  db color_outline, '│'
+  db color_duplicate, '................'
+  db color_outline, '│'
+  db term_color_clear, 0ah
 dupline_len: equ $-dupline
 
 footer:
-  color_outline
-  db '╰────────┴───────────────────────────────────────────────┴────────────────╯'
-  term_color_clear
-  db 0ah
+  db color_outline, '╰────────┴───────────────────────────────────────────────┴────────────────╯'
+  db term_color_clear, 0ah
 footer_len: equ $-footer
 
 map_hex:
@@ -218,7 +222,7 @@ input:
   mov rdi, buf
   call memset
 
-  ; read 16 bytes into the input buffer
+  ; read up to 16 bytes into the input buffer
   mov rdx, buf_len
   mov rsi, buf
   mov rdi, stdin
@@ -343,10 +347,10 @@ iter:
   ; copy ascii value into the buffer
   mov byte [rdi], dl
 
-  ; increase the format/hex buffer pointer by 3 (<hex_1><hex_2><space>)
-  add rbp, 3h
-  ; increase the format/ascii buffer pointer by 1
-  inc rdi
+  ; increase the format/hex buffer pointer
+  add rbp, hex_len
+  ; increase the format/ascii buffer pointer
+  add rdi, ascii_len
   ; increase the input buffer index by 1
   inc rcx
   jmp .begin
